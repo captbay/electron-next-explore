@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu } = require("electron");
+const { app, BrowserWindow, Tray, Menu, shell } = require("electron");
 const serve = require("electron-serve");
 const path = require("path");
 
@@ -28,6 +28,12 @@ const createWindow = () => {
       win.webContents.reloadIgnoringCache();
     });
   }
+
+  // dont open new window
+  win.webContents.setWindowOpenHandler((details) => {
+    shell.openExternal(details.url);
+    return { action: "deny" };
+  });
 
   // Tray
   let isHidden = false;
