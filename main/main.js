@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, Tray, Menu } = require("electron");
 const serve = require("electron-serve");
 const path = require("path");
 
@@ -28,6 +28,46 @@ const createWindow = () => {
       win.webContents.reloadIgnoringCache();
     });
   }
+
+  // Tray
+  let isHidden = false;
+
+  const menuTemplate = [
+    {
+      id: "hide",
+      label: "Hide",
+      click: () => {
+        if (isHidden) {
+          win.show();
+          win.focus({ steal: true });
+          menuTemplate[0].label = "Hide";
+        } else {
+          win.hide();
+          menuTemplate[0].label = "Show";
+        }
+
+        isHidden = !isHidden;
+
+        const newMenu = Menu.buildFromTemplate(menuTemplate);
+        tray.setContextMenu(newMenu);
+      },
+    },
+    {
+      id: "quit",
+      label: "Quit",
+      click: () => {
+        app.quit();
+      },
+    },
+  ];
+
+  const icon = path.resolve(__dirname, "../assets/iconTemplate.png");
+
+  const tray = new Tray(icon);
+
+  const context = Menu.buildFromTemplate(menuTemplate);
+
+  tray.setContextMenu(context);
 };
 
 app.on("ready", () => {
